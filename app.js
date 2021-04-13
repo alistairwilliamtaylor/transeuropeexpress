@@ -1,14 +1,23 @@
 const ticketDisplay = document.querySelector('.ticket_display')
+const originInput = document.querySelector('#origin')
+const destinationInput = document.querySelector('#destination')
+const stationList = document.querySelector('#stations')
+const form = document.querySelector('form')
 
-const alameinLine = ['Flinders Street', 'Richmond', 'East Richmond', 'Burnley', 'Hawthorn', 'Glenferrie']
-const glenWaverlyLine = ['Flagstaff', 'Melbourne Central', 'Parliament', 'Richmond', 'Kooyong', 'Tooronga']
-const sandringhamLine = ['Southern Cross', 'Richmond', 'South Yarra', 'Prahran', 'Windsor']
+const blueLine = ['Malmo', 'Copenhagen', 'Berlin', 'Erfurt', 'Munich', 'Zurich', 'Milan', 'Florence', 'Rome']
+const redLine = ['Barcelona', 'Toulouse', 'Paris', 'Strasbourg', 'Munich', 'Prague', 'Krakow', 'Warsaw', 'Kaliningrad']
+const yellowLine = ['Amsterdam', 'Antwerp', 'Brussels', 'Frankfurt', 'Munich', 'Vienna', 'Budapest', 'Belgrade', 'Bucharest']
 
-let origin = 'Flagstaff'
+const allStations = [...blueLine, ...redLine, ...yellowLine]
+allStations.map(station => `<option value=${station}>`)
+            .forEach(htmlLine => stationList.innerHTML = stationList.innerHTML + htmlLine);
+
+
+let origin = 'Malmo'
 let originLine = null
 let originStpNum = null
 let originRichmondNum = null
-let destination = 'Kooyong'
+let destination = 'Florence'
 let destinationLine = null
 let destStpNum = null
 let destRichmondNum = null
@@ -18,12 +27,12 @@ let firstTravelVisual = null
 let secondTravelVisual = null
 
 
-if (origin === 'Richmond') {
+if (origin === 'Munich') {
     destinationLine = getLineArray(destination)
     originLine = destinationLine
     calculateSingleLine()
 }
-else if (destination === 'Richmond') {
+else if (destination === 'Munich') {
     originLine = getLineArray(origin)
     destinationLine = originLine
     calculateSingleLine()
@@ -41,14 +50,14 @@ else {
 
 //finds the line that a station is on, and returns the array of the stops on this line
 function getLineArray(stationName) {
-    if (alameinLine.indexOf(stationName) > -1) {
-        return alameinLine
+    if (blueLine.includes(stationName)) {
+        return blueLine
     } 
-    else if (glenWaverlyLine.indexOf(stationName) > -1) {
-        return glenWaverlyLine
+    else if (redLine.includes(stationName)) {
+        return redLine
     }
-    else if (sandringhamLine.indexOf(stationName) > -1) {
-        return sandringhamLine
+    else if (yellowLine.includes(stationName)) {
+        return yellowLine
     }
 }
 
@@ -134,3 +143,9 @@ function displayMultipleLines() {
     // ${secondTravelVisual}
 }
 
+form.addEventListener('submit', event => {
+    event.preventDefault()
+    console.log(`origin is ${originInput.value}`)
+    console.log(`destination is ${destinationInput.value}`)
+    //it's working up to here
+})

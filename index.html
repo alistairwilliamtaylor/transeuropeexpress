@@ -13,6 +13,14 @@
     <div class="container">
         <h1>TRANS EUROPE EXPRESS</h1>
         <img src="transeuropeexpressmap.png" alt="">
+        <form action="">
+            <label for="origin">origin:</label>
+            <input type="text" list="stations" name="origin" id="origin" size="13">
+            <label for="destination">destination:</label>
+            <input type="text" list="stations" name="destination" id="destination" size="13">
+            <datalist id="stations"></datalist>
+            <button>itinerary</button>            
+        </form>
         <section class="ticket_display"></section>
     </div>
 

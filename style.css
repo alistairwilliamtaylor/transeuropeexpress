@@ -3,9 +3,15 @@
     margin: 0 auto;
 }
 
-h1, h2, h3 {
+h1, h2, h3, label, button  {
     font-family: 'Jost', sans-serif;
     text-align: center;
+}
+
+
+form {
+    display: flex;
+    justify-content: space-evenly;
 }
 
 img {
