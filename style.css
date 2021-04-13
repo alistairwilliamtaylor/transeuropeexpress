@@ -1,0 +1,14 @@
+.container {
+    width: 50%;
+    margin: 0 auto;
+}
+
+h1, h2, h3 {
+    font-family: 'Jost', sans-serif;
+    text-align: center;
+}
+
+img {
+    width: 100%;
+    display: block;
+}
