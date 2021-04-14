@@ -9,16 +9,33 @@ const redLine = ['Barcelona', 'Toulouse', 'Paris', 'Strasbourg', 'Munich', 'Prag
 const yellowLine = ['Amsterdam', 'Antwerp', 'Brussels', 'Frankfurt', 'Munich', 'Vienna', 'Budapest', 'Belgrade', 'Bucharest']
 
 const allStations = [...blueLine, ...redLine, ...yellowLine]
-allStations.map(station => `<option value=${station}>`)
-            .forEach(htmlLine => stationList.innerHTML = stationList.innerHTML + htmlLine);
+allStations
+        .map(station => `<option value=${station}>`)
+        .forEach(htmlLine => stationList.innerHTML = stationList.innerHTML + htmlLine);
+
+form.addEventListener('submit', event => {
+    event.preventDefault()
+    console.log(`origin is ${originInput.value}`)
+    console.log(`destination is ${destinationInput.value}`)
+    let origin = originInput.value
+    let destination = destinationInput.value
+    let { originLine, destinationLine } = determineLines(origin, destination)
+    console.log(originLine)
+    console.log(destinationLine)
+    //it's working up to here
 
 
-let origin = 'Malmo'
-let originLine = null
+    // if (originLine === destinationLine) {
+    //     calculateSingleLine()
+    // }
+    // else {
+    //     calculateMultipleLines()
+    // }  
+
+})
+
 let originStpNum = null
 let originRichmondNum = null
-let destination = 'Florence'
-let destinationLine = null
 let destStpNum = null
 let destRichmondNum = null
 let totalStops = null
@@ -26,26 +43,22 @@ let travelVisual = null
 let firstTravelVisual = null
 let secondTravelVisual = null
 
-
-if (origin === 'Munich') {
-    destinationLine = getLineArray(destination)
-    originLine = destinationLine
-    calculateSingleLine()
-}
-else if (destination === 'Munich') {
-    originLine = getLineArray(origin)
-    destinationLine = originLine
-    calculateSingleLine()
-}
-else {
-    originLine = getLineArray(origin)
-    destinationLine = getLineArray(destination)
-    if (originLine === destinationLine) {
-        calculateSingleLine()
+function determineLines(origin, destination) {
+    let destinationLine = ''
+    let originLine = ''
+    if (origin === 'Munich') {
+        destinationLine = getLineArray(destination)
+        originLine = destinationLine
+    }
+    else if (destination === 'Munich') {
+        originLine = getLineArray(origin)
+        destinationLine = originLine
     }
     else {
-        calculateMultipleLines()
-    }   
+        originLine = getLineArray(origin)
+        destinationLine = getLineArray(destination)
+    }
+    return { originLine, destinationLine}
 }
 
 //finds the line that a station is on, and returns the array of the stops on this line
@@ -142,10 +155,3 @@ function displayMultipleLines() {
     // ${firstTravelVisual}
     // ${secondTravelVisual}
 }
-
-form.addEventListener('submit', event => {
-    event.preventDefault()
-    console.log(`origin is ${originInput.value}`)
-    console.log(`destination is ${destinationInput.value}`)
-    //it's working up to here
-})
