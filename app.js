@@ -15,66 +15,73 @@ allStations
 
 form.addEventListener('submit', event => {
     event.preventDefault()
-    console.log(`origin is ${originInput.value}`)
-    console.log(`destination is ${destinationInput.value}`)
     let origin = originInput.value
     let destination = destinationInput.value
-    let { originLine, destinationLine } = determineLines(origin, destination)
-    console.log(originLine)
-    console.log(destinationLine)
+    let { originLineStops, originLineName, destinationLineStops, destinationLineName } = determineLines(origin, destination)
+    console.log(originLineStops)
+    if (isSameLine(originLineName, destinationLineName)) {
+        let { numberOfStops, stopsList } = calculateSingleLine(originLineStops, origin, destination)
+        displaySingleLine(origin, destination, numberOfStops, stopsList, originLineName)
+    } else {
+        calculateMultipleLines()
+    }
+
     //it's working up to here
-
-
-    // if (originLine === destinationLine) {
-    //     calculateSingleLine()
-    // }
-    // else {
-    //     calculateMultipleLines()
-    // }  
 
 })
 
-let originStpNum = null
-let originRichmondNum = null
-let destStpNum = null
-let destRichmondNum = null
-let totalStops = null
-let travelVisual = null
-let firstTravelVisual = null
-let secondTravelVisual = null
+const isSameLine = (originLine, destinationLine) => 
+    originLine === destinationLine
 
+//deals with Munich being on all lines to determine lines travelled  - SUCCESS
 function determineLines(origin, destination) {
-    let destinationLine = ''
-    let originLine = ''
+
     if (origin === 'Munich') {
-        destinationLine = getLineArray(destination)
-        originLine = destinationLine
+        let [destinationLineStops, destinationLineName] = getLineArray(destination)
+        let [originLineStops, originLineName] = [destinationLineStops, destinationLineName]
+        return { originLineStops, originLineName, destinationLineStops, destinationLineName }
     }
     else if (destination === 'Munich') {
-        originLine = getLineArray(origin)
-        destinationLine = originLine
+        let [originLineStops, originLineName] = getLineArray(origin)
+        let [destinationLineStops, destinationLineName] = [originLineStops, originLineName]
+        return { originLineStops, originLineName, destinationLineStops, destinationLineName }
     }
     else {
-        originLine = getLineArray(origin)
-        destinationLine = getLineArray(destination)
+        let [originLineStops, originLineName] = getLineArray(origin)
+        let [destinationLineStops, destinationLineName] = getLineArray(destination)
+        return { originLineStops, originLineName, destinationLineStops, destinationLineName }
     }
-    return { originLine, destinationLine}
+    
 }
 
-//finds the line that a station is on, and returns the array of the stops on this line
+//finds the line that a station is on - SUCCESS
 function getLineArray(stationName) {
     if (blueLine.includes(stationName)) {
-        return blueLine
+        console.log(blueLine)
+        console.log('blue')
+        return [blueLine, 'blue']
     } 
     else if (redLine.includes(stationName)) {
-        return redLine
+        console.log(redLine)
+        console.log('red')
+        return [redLine, 'red']
     }
     else if (yellowLine.includes(stationName)) {
-        return yellowLine
+        console.log(yellowLine)
+        console.log('yellow')
+        return [yellowLine, 'yellow']
     }
 }
 
-//this function takes three arguments (originStop, destinationStop, line) and returns an object with 2 key-value pairs - numberOfStops and stopsList
+//deals with finding stations and for case of singleLine - SUCCESS
+function calculateSingleLine(line, origin, destination) {
+    let originStpNum = line.indexOf(origin);
+    let destStpNum = line.indexOf(destination);
+    let {numberOfStops, stopsList} = calculateStretch(originStpNum, destStpNum, line);
+    return { numberOfStops, stopsList }
+}
+
+//calculates the actual stations travelled through on a line - SUCCESS
 function calculateStretch(originStop, destinationStop, line) {
     if (destinationStop < originStop) {
         numberOfStops = originStop - destinationStop;
@@ -87,23 +94,15 @@ function calculateStretch(originStop, destinationStop, line) {
     return {numberOfStops, stopsList}
 }
 
-// calculates the number of stops and creates visual display of direction of travel FOR ONE LINE 
-function calculateSingleLine() {
-    originStpNum = originLine.indexOf(origin);
-    destStpNum = destinationLine.indexOf(destination);
-    let {numberOfStops, stopsList} = calculateStretch(originStpNum, destStpNum, originLine);
-    displaySingleLine(numberOfStops, stopsList)
-}
-
-// displays a single line trip
-function displaySingleLine(numberOfStops, stopsList) {
+// displays a single line trip (COULD REFACTOR OUT ORIGIN AND DESTINATION AND GET FROM STOPSLIST) - SUCCESS
+function displaySingleLine(origin, destination, numberOfStops, stopsList, originLineName) {
     let htmlDisplay = ''
     stopsList.forEach((stop, index) => {
         if (index === stopsList.length - 1) {
             htmlDisplay = htmlDisplay + `<h3>${stop}</h3>`
         }
         else {
-            htmlDisplay = htmlDisplay + `<h3>${stop}</h3><h3>||</h3>`
+            htmlDisplay = htmlDisplay + `<h3>${stop}</h3><h3 class="${originLineName}">||</h3>`
         }
     })
 
