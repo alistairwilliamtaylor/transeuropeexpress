@@ -18,12 +18,13 @@ form.addEventListener('submit', event => {
     let origin = originInput.value
     let destination = destinationInput.value
     let { originLineStops, originLineName, destinationLineStops, destinationLineName } = determineLines(origin, destination)
-    console.log(originLineStops)
     if (isSameLine(originLineName, destinationLineName)) {
         let { numberOfStops, stopsList } = calculateSingleLine(originLineStops, origin, destination)
         displaySingleLine(origin, destination, numberOfStops, stopsList, originLineName)
     } else {
-        calculateMultipleLines()
+        let { totalNumberofStops, originLineStopList, destinationLineStopList } = calculateMultipleLines(originLineStops, destinationLineStops, origin, destination)
+        console.log(`IMPORTANT ${originLineStopList}`)
+        displayMultipleLines(origin, destination, totalNumberofStops, originLineStopList, destinationLineStopList, originLineName, destinationLineName)
     }
 
     //it's working up to here
@@ -73,15 +74,15 @@ function getLineArray(stationName) {
     }
 }
 
-//deals with finding stations and for case of singleLine - SUCCESS
+//finds station numbers on line for singleLine - SUCCESS
 function calculateSingleLine(line, origin, destination) {
     let originStpNum = line.indexOf(origin);
     let destStpNum = line.indexOf(destination);
-    let {numberOfStops, stopsList} = calculateStretch(originStpNum, destStpNum, line);
+    let [numberOfStops, stopsList] = calculateStretch(originStpNum, destStpNum, line);
     return { numberOfStops, stopsList }
 }
 
-//calculates the actual stations travelled through on a line - SUCCESS
+//calculates the stations travelled through on a line given station number - SUCCESS
 function calculateStretch(originStop, destinationStop, line) {
     if (destinationStop < originStop) {
         numberOfStops = originStop - destinationStop;
@@ -91,18 +92,18 @@ function calculateStretch(originStop, destinationStop, line) {
         numberOfStops = destinationStop - originStop;
         stopsList = line.slice(originStop, destinationStop+1);
     }
-    return {numberOfStops, stopsList}
+    return [numberOfStops, stopsList]
 }
 
 // displays a single line trip (COULD REFACTOR OUT ORIGIN AND DESTINATION AND GET FROM STOPSLIST) - SUCCESS
-function displaySingleLine(origin, destination, numberOfStops, stopsList, originLineName) {
+function displaySingleLine(origin, destination, numberOfStops, stopsList, lineName) {
     let htmlDisplay = ''
     stopsList.forEach((stop, index) => {
         if (index === stopsList.length - 1) {
             htmlDisplay = htmlDisplay + `<h3>${stop}</h3>`
         }
         else {
-            htmlDisplay = htmlDisplay + `<h3>${stop}</h3><h3 class="${originLineName}">||</h3>`
+            htmlDisplay = htmlDisplay + `<h3>${stop}</h3><h3 class="${lineName}">||</h3>`
         }
     })
 
@@ -118,36 +119,59 @@ function displaySingleLine(origin, destination, numberOfStops, stopsList, origin
     `
 }
 
-//FOR TWO LINES calculates the total number of stops and creates two visual displays of direction of travel
-function calculateMultipleLines() {
-    originStpNum = originLine.indexOf(origin);
-    originRichmondNum = originLine.indexOf('Richmond');
-    let firstLineResult = calculateStretch(originStpNum, originRichmondNum, originLine);
-    firstTravelVisual = firstLineResult.travelVisual;
-    let firstLineStops = firstLineResult.numberOfStops;
+//finds station numbers on line for multiple lines
+function calculateMultipleLines(originLine, destinationLine, origin, destination) {
+    let originStpNum = originLine.indexOf(origin);
+    let originMunichNum = originLine.indexOf('Munich');
+    let [originLineNumberofStops, originLineStopList] = calculateStretch(originStpNum, originMunichNum, originLine);
 
-    destRichmondNum = destinationLine.indexOf('Richmond');
-    destStpNum = destinationLine.indexOf(destination);
-    let secondLineResult = calculateStretch(destRichmondNum, destStpNum, destinationLine);
-    secondTravelVisual = secondLineResult.travelVisual;
-    let secondLineStops = secondLineResult.numberOfStops;
+    let destMunichNum = destinationLine.indexOf('Munich');
+    let destStpNum = destinationLine.indexOf(destination);
+    let [destinationLineNumberofStops, destinationLineStopList] = calculateStretch(destMunichNum, destStpNum, destinationLine);
 
-    totalStops = firstLineStops + secondLineStops;
+    let totalNumberofStops = originLineNumberofStops + destinationLineNumberofStops;
     
-    displayMultipleLines()
+    return { totalNumberofStops, originLineStopList, destinationLineStopList }
 }
 
 // displays a two line trip
-function displayMultipleLines() {
+function displayMultipleLines(origin, destination, totalNumberofStops, originLineStopList, destinationLineStopList, originLineName, destinationLineName) {
+    
+    let originLineHTMLDisplay = ''
+    originLineStopList.forEach((stop, index) => {
+        if (index === originLineStopList.length - 1) {
+            originLineHTMLDisplay = originLineHTMLDisplay + `<h3>${stop}</h3>`
+        }
+        else {
+            originLineHTMLDisplay = originLineHTMLDisplay + `<h3>${stop}</h3><h3 class="${originLineName}">||</h3>`
+        }
+    })
+   
+    let destinationLineHTMLDisplay = ''
+    destinationLineStopList.forEach((stop, index) => {
+        if (index === destinationLineStopList.length - 1) {
+            destinationLineHTMLDisplay = destinationLineHTMLDisplay + `<h3>${stop}</h3>`
+        }
+        else {
+            destinationLineHTMLDisplay = destinationLineHTMLDisplay + `<h3>${stop}</h3><h3 class="${destinationLineName}">||</h3>`
+        }
+    })
+
+    
+    
     ticketDisplay.innerHTML = 
     `
     <h2> Origin: ${origin} </h2>
     <h2> Destination: ${destination} </h2>
 
-    <h2> Total Stops: ${numberOfStops}</h2> 
+    <h2> Total Stops: ${totalNumberofStops}</h2> 
 
     <h2> Itinerary <h2>
-    ${htmlDisplay}
+    ${originLineHTMLDisplay}
+    <h3 class="${originLineName}">||</h3>
+    <h3> TRANSFER </h3>
+    <h3 class="${destinationLineName}">||</h3>
+    ${destinationLineHTMLDisplay}
     `
 
     // totalStops
